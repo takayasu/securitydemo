@@ -1,5 +1,6 @@
 package dev.xvision.demo.securitydemo;
 
+import dev.xvision.demo.securitydemo.security.JWTAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.sql.DataSource;
 
@@ -23,7 +25,9 @@ public class SecurityConfiguration {
                 authz.mvcMatchers("/").permitAll()
                         .mvcMatchers("/users/create").permitAll()
                         .anyRequest().authenticated()
-                        .and().formLogin().and().csrf().disable();
+                        .and().formLogin()
+                        .successHandler(jwtAuthenticationSuccessHandler())
+                        .and().csrf().disable();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -32,8 +36,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    UserDetailsManager users(DataSource dataSource){
+    public UserDetailsManager users(DataSource dataSource){
         return new JdbcUserDetailsManager(dataSource);
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler jwtAuthenticationSuccessHandler(){
+        return new JWTAuthenticationSuccessHandler();
     }
 
 }
