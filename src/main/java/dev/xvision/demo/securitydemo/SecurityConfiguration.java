@@ -20,8 +20,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authz) -> {
             try {
-                authz.mvcMatchers("/").permitAll().anyRequest().authenticated()
-                        .and().formLogin();
+                authz.mvcMatchers("/").permitAll()
+                        .mvcMatchers("/users/create").permitAll()
+                        .anyRequest().authenticated()
+                        .and().formLogin().and().csrf().disable();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
